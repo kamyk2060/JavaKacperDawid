@@ -3,66 +3,65 @@ import java.util.*;
 class Sequence extends AbstractSequence {
 
     private int delta;
-    private int[] encodedData;
-    private int[] decoded;
+    private int[] ZdekodowaneDane;
+    private int[] Zakodowane;
 
     @Override
     public void sequence(int[] data, int deltaSegmentSize) {
-        encodedData = data.clone();
+        ZdekodowaneDane = data.clone();
         delta = deltaSegmentSize;
-        decoded = null;
+        Zakodowane = null;
     }
 
     @Override
     public int[] decode() {
-        if (decoded != null) {
-            return decoded.clone();
+        if (Zakodowane != null) {
+            return Zakodowane.clone();
         }
 
-        decoded = new int[encodedData.length];
-        if (encodedData.length == 0) {
-            return decoded.clone();
+        Zakodowane = new int[ZdekodowaneDane.length];
+        if (ZdekodowaneDane.length == 0) {
+            return Zakodowane.clone();
         }
 
-        for (int i = 0; i < encodedData.length; i++) {
+        for (int i = 0; i < ZdekodowaneDane.length; i++) {
             if (i % (delta + 1) == 0) {
-                // To jest wartość bazowa - przepisz bez zmian
-                decoded[i] = encodedData[i];
+            
+                Zakodowane[i] = ZdekodowaneDane[i];
             } else {
-                // To jest delta - oblicz jako suma wartości bazowej i wszystkich delt od ostatniej wartości bazowej
+                
                 int indexStart = i - (i % (delta + 1));
-                int sum = decoded[indexStart];
+                int sum = Zakodowane[indexStart];
 
-                // Dodaj wszystkie delty od wartości bazowej do bieżącego indeksu
                 for (int j = indexStart + 1; j <= i; j++) {
-                    sum += encodedData[j];
+                    sum += ZdekodowaneDane[j];
                 }
-                decoded[i] = sum;
+                Zakodowane[i] = sum;
             }
         }
 
-        return decoded.clone();
+        return Zakodowane.clone();
     }
 
     @Override
     public int[] encode(int deltaSegmentSize) {
         // Najpierw upewnij się, że mamy odkodowane dane
-        if (decoded == null) {
+        if (Zakodowane == null) {
             decode();
         }
 
-        int[] result = new int[decoded.length];
-        if (decoded.length == 0) {
+        int[] result = new int[Zakodowane.length];
+        if (Zakodowane.length == 0) {
             return result;
         }
 
-        for (int i = 0; i < decoded.length; i++) {
+        for (int i = 0; i < Zakodowane.length; i++) {
             if (i % (deltaSegmentSize + 1) == 0) {
-                // Wartość bazowa - przepisz bez zmian
-                result[i] = decoded[i];
+                
+                result[i] = Zakodowane[i];
             } else {
-                // Delta - różnica między obecną a poprzednią wartością
-                result[i] = decoded[i] - decoded[i - 1];
+                
+                result[i] = Zakodowane[i] - Zakodowane[i - 1];
             }
         }
 
@@ -71,40 +70,36 @@ class Sequence extends AbstractSequence {
 
     @Override
     public boolean equals(int[] data, int deltaSegmentSize) {
-        if (decoded == null) {
+        if (Zakodowane == null) {
             decode();
         }
 
-        // Sprawdź czy tablica data po odkodowaniu z podanym deltaSegmentSize
-        // jest równa naszej odkodowanej tablicy
-
-        int[] otherDecoded = new int[data.length];
+        int[] NoweZakodowane = new int[data.length];
         if (data.length == 0) {
-            return decoded.length == 0;
+            return Zakodowane.length == 0;
         }
 
-        // Odkoduj przekazaną tablicę data z podanym deltaSegmentSize
         for (int i = 0; i < data.length; i++) {
             if (i % (deltaSegmentSize + 1) == 0) {
-                otherDecoded[i] = data[i];
+                NoweZakodowane[i] = data[i];
             } else {
-                int baseIndex = i - (i % (deltaSegmentSize + 1));
-                int sum = otherDecoded[baseIndex];
-                for (int j = baseIndex + 1; j <= i; j++) {
+                int PoczatekIndex = i - (i % (deltaSegmentSize + 1));
+                int sum = NoweZakodowane[PoczatekIndex];
+                for (int j = PoczatekIndex + 1; j <= i; j++) {
                     sum += data[j];
                 }
-                otherDecoded[i] = sum;
+                NoweZakodowane[i] = sum;
             }
         }
 
         // Porównaj rozmiary
-        if (otherDecoded.length != decoded.length) {
+        if (NoweZakodowane.length != Zakodowane.length) {
             return false;
         }
 
         // Porównaj elementy
-        for (int i = 0; i < otherDecoded.length; i++) {
-            if (otherDecoded[i] != decoded[i]) {
+        for (int i = 0; i < NoweZakodowane.length; i++) {
+            if (NoweZakodowane[i] != Zakodowane[i]) {
                 return false;
             }
         }
