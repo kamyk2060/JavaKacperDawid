@@ -16,20 +16,21 @@ class RectangularIntegration implements NumericalIntegration {
 
         double xp = range.min();  // początek
         double xk = range.max();  // koniec
-        double dx = (xk - xp) / subintervals;  // szerokość
-        double sum = 0.0;
 
         if (xp >= xk) {
             return 0.0;
         }
 
-        for (int i = 1; i <= subintervals; i++) {
+        double dx = (xk - xp) / subintervals;  // szerokość
+        double sum = 0.0;
+
+        for (int i = 0; i < subintervals; i++) {
             double left = xp + i * dx;
             double right = left + dx;
-            double mid = (left + right) / 2.0;  // ŚRODEK
+            double mid = (left + right) / 2.0;  // środek
 
-            // zabronionym
-            if (!CzyZabroniony(mid)) {
+            // jeśli nie w obszarze zabronionym
+            if (!CzyJestZabroniony(mid)) {
                 sum += NaszaFunkcja.apply(mid);
             }
         }
@@ -37,7 +38,7 @@ class RectangularIntegration implements NumericalIntegration {
         return sum * dx;
     }
 
-    private boolean CzyZabroniony(double x) {
+    private boolean CzyJestZabroniony(double x) {
         for (Range element : NaszaFunkcja.domainExclusions()) {
             if (x >= element.min() && x <= element.max()) {
                 return true;
@@ -45,5 +46,4 @@ class RectangularIntegration implements NumericalIntegration {
         }
         return false;
     }
-
 }
