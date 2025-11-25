@@ -45,7 +45,6 @@ class Sequence extends AbstractSequence {
 
     @Override
     public int[] encode(int deltaSegmentSize) {
-        // Najpierw upewnij się, że mamy odkodowane dane
         if (Zakodowane == null) {
             decode();
         }
